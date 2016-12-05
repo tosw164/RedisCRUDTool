@@ -9,7 +9,6 @@ import java.util.ArrayList;
 
 import javax.swing.Box;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -104,6 +103,12 @@ public class MainEditorClass extends JPanel {
 		add(setupKeyValueList(), BorderLayout.CENTER);
 	}
 	
+	private void refreshTable(){
+		this.remove(scroll_pane);
+		add(setupKeyValueList(), BorderLayout.CENTER);
+		frame.pack();
+	}
+	
 	private void createPadding(Box source, int width, int height){
 		source.add(Box.createRigidArea(new Dimension(width, height)));
 	}
@@ -130,6 +135,8 @@ public class MainEditorClass extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("update");
+				refreshTable();
+				
 			}
 		});
 
@@ -156,14 +163,18 @@ public class MainEditorClass extends JPanel {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("add");
-				controller.add("Hello", "World");
 				((DefaultTableModel)table.getModel()).addRow(new Object[]{"Hello", "World"});
 				controller.ping();
+				clearTextFields();
 			}
 		});
 
 		return add_button;
+	}
+	
+	private void clearTextFields(){
+		key_field.setText("");
+		value_field.setText("");
 	}
 
 	private Component setupClearButton() {
@@ -173,8 +184,9 @@ public class MainEditorClass extends JPanel {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				key_field.setText("");
-				value_field.setText("");
+				System.out.println(key_field.getText());
+				System.out.println(value_field.getText());
+				clearTextFields();
 			}
 		});
 
