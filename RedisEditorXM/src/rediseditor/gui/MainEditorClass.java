@@ -160,7 +160,8 @@ public class MainEditorClass extends JPanel {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("clear");
+				key_field.setText("");
+				value_field.setText("");
 			}
 		});
 
