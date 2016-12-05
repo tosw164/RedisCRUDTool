@@ -1,11 +1,13 @@
-package redis;
+package rediseditor.redis;
 
 import java.util.ArrayList;
 import java.util.Set;
 
-import gui.DialogBoxes;
+import javax.swing.JOptionPane;
+
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.exceptions.JedisConnectionException;
+import rediseditor.gui.DialogBoxes;
 
 public class RedisController {
 	private static RedisController controller_instance;
@@ -51,4 +53,5 @@ public class RedisController {
 		return array_to_return;
 	}
 	
+
 }

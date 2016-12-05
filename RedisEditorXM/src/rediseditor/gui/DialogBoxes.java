@@ -1,4 +1,4 @@
-package gui;
+package rediseditor.gui;
 
 import javax.swing.JOptionPane;
 
@@ -7,7 +7,7 @@ public class DialogBoxes {
 		JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
 
 	}
-	
+
 	
 
 }
