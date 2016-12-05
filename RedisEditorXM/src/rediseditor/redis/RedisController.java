@@ -22,7 +22,7 @@ public class RedisController {
 	}
 	
 	private RedisController(String address){
-		jedis_instance=new Jedis(address);
+		newInstance(address);
 	}
 	
 	public static void newInstance(String connection_address){
