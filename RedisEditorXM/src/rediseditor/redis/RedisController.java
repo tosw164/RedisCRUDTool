@@ -54,6 +54,10 @@ public class RedisController {
 		return array_to_return;
 	}
 	
+	public Set<String> getKeys(){
+		return jedis_instance.keys("*");
+	}
+	
 	public boolean delete(String key){
 		if (DialogBoxes.displayWarningPrompt("Are you sure you want to delete ["+key+"] ?")){
 			jedis_instance.del(key);

@@ -5,8 +5,11 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.security.KeyFactory;
 import java.util.ArrayList;
+import java.util.Set;
 
+import javax.management.openmbean.KeyAlreadyExistsException;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -21,6 +24,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+
+import org.omg.CORBA.portable.ValueFactory;
 
 import rediseditor.redis.RedisController;
 
@@ -114,6 +119,7 @@ public class MainEditorClass extends JPanel {
 	}
 
 	private JButton setupConnectButton(){
+		// TODO haven't done.
 		JButton connection_button = new JButton("Connect");
 		connection_button.setMaximumSize(new Dimension(300,30));
 		connection_button.addActionListener(new ActionListener() {
@@ -134,9 +140,9 @@ public class MainEditorClass extends JPanel {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				//TODO need to create window with key and value fields that user enters
 				System.out.println("update");
 				refreshTable();
-				
 			}
 		});
 
@@ -155,7 +161,6 @@ public class MainEditorClass extends JPanel {
 		return value_field;
 	}
 
-
 	private JButton setupAddButton(){
 		JButton add_button = new JButton("Add");
 		add_button.setMaximumSize(new Dimension(100, 30));
@@ -163,13 +168,36 @@ public class MainEditorClass extends JPanel {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				((DefaultTableModel)table.getModel()).addRow(new Object[]{"Hello", "World"});
-				controller.ping();
+				addButtonLogic();
 				clearTextFields();
+				refreshTable();
 			}
 		});
 
 		return add_button;
+	}
+	
+	private void addButtonLogic(){
+		String key_entered = key_field.getText();
+		String value_entered = value_field.getText();
+		
+		Set<String> list_of_keys = controller.getKeys();
+		boolean key_already_present = false;
+		for(String key: list_of_keys){
+			if (key_entered.equals(key)){
+				key_already_present = true;
+			}
+		}
+		if (key_already_present){
+			boolean to_overwrite = DialogBoxes.displayWarningPrompt("Key already exists, do you want to overwrite?");
+			if (to_overwrite){
+				controller.add(key_entered, value_entered);
+			}
+		} else { //Key not already present in database
+			if (DialogBoxes.displayConfirmationPrompt("Are you sure you want to add this key value pair?")){
+				controller.add(key_entered, value_entered);
+			}
+		}
 	}
 	
 	private void clearTextFields(){
@@ -184,8 +212,6 @@ public class MainEditorClass extends JPanel {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println(key_field.getText());
-				System.out.println(value_field.getText());
 				clearTextFields();
 			}
 		});
@@ -204,8 +230,7 @@ public class MainEditorClass extends JPanel {
 				if (index_selected != -1){
 					String key_to_remove = (String) table.getValueAt(table.getSelectedRow(), 0);
 					if ( controller.delete(key_to_remove) ){
-						((DefaultTableModel)table.getModel()).removeRow(table.getSelectedRow());
-
+						refreshTable();
 					}
 				}
 			}
