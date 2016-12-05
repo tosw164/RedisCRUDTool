@@ -1,12 +1,18 @@
 package rediseditor.gui;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 import javax.sound.midi.ControllerEventListener;
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -16,20 +22,28 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.RowSorter;
+import javax.swing.SortOrder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 import com.sun.media.sound.ModelAbstractChannelMixer;
 
+import javafx.scene.layout.Border;
 import redis.clients.jedis.Jedis;
 import rediseditor.redis.RedisController;
 
-public class MainEditorClass extends JFrame {
+public class MainEditorClass extends JPanel {
 
-	private JPanel ui_panel;
 	private JTable table;
 	private JScrollPane scroll_pane;
+	private JTextField value_field;
+	private JTextField key_field;
+	private TableRowSorter<TableModel> sorter;
 	private static RedisController controller;
+	private static JFrame frame;
 
 	/**
 	 * Launch the application.
@@ -38,8 +52,7 @@ public class MainEditorClass extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					MainEditorClass frame = new MainEditorClass();
-					frame.setVisible(true);
+					createGUI();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -47,33 +60,162 @@ public class MainEditorClass extends JFrame {
 		});
 	}
 
+	public static void createGUI(){
+		frame = new JFrame("RedisEditor");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setLocationRelativeTo(null);
+		frame.setPreferredSize(new Dimension(1000, 800));
+		frame.add(new MainEditorClass());
+		frame.pack();
+		frame.setVisible(true);
+	}
+
 	public MainEditorClass() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setLocationRelativeTo(null);
-		setSize(800, 500);
-		setResizable(false);
+		controller = RedisController.getInstance(""); //TODO delete later
 
-		controller = RedisController.getInstance();
-		
-		setupJPanel();
+		Box whole_cluster = Box.createHorizontalBox();
+
+		Box left_button_cluster = Box.createVerticalBox();
+		left_button_cluster.add(setupConnectButton());
+		left_button_cluster.add(Box.createRigidArea(new Dimension(1, 5)));
+		left_button_cluster.add(setupUpdateButton());
+		left_button_cluster.add(Box.createRigidArea(new Dimension(1, 10)));
+		left_button_cluster.add(new JLabel("Key:"));
+		left_button_cluster.add(setupKeyTextField());
+		left_button_cluster.add(Box.createRigidArea(new Dimension(1, 5)));
+		left_button_cluster.add(new JLabel("Value:"));
+		left_button_cluster.add(setupValueTextField());
+		left_button_cluster.add(Box.createRigidArea(new Dimension(1, 5)));
+
+		Box add_clear_cluster = Box.createHorizontalBox();
+		add_clear_cluster.add(setupAddButton());
+		add_clear_cluster.add(Box.createRigidArea(new Dimension(5, 1)));
+		add_clear_cluster.add(setupClearButton());
+
+		left_button_cluster.add(add_clear_cluster);
+
+		left_button_cluster.add(Box.createRigidArea(new Dimension(1, 10)));
+
+		left_button_cluster.add(setupDeleteButton());
+
+		left_button_cluster.add(Box.createRigidArea(new Dimension(1, 40)));
+
+		left_button_cluster.add(setupCloseButton());
+
+
+		setLayout(new BorderLayout());
+		add(left_button_cluster, BorderLayout.WEST);
+		add(setupKeyValueList(), BorderLayout.CENTER);
 	}
 
-	private void setupJPanel(){
-		ui_panel = new JPanel();
-		setContentPane(ui_panel);
+	private JButton setupConnectButton(){
+		JButton connection_button = new JButton("Connect");
+		connection_button.setMaximumSize(new Dimension(300,30));
+		connection_button.addActionListener(new ActionListener() {
 
-		ui_panel.setLayout(null);
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("connect");
+			}
+		});
 
-		setupKeyValueList();
-		setupConnectButton();
-		setupAddFunctionality();
-		setupDeleteButton();
-		setupUpdateButton();
-		setupCloseButton();
-		
+		return connection_button;
 	}
 
-	private void setupKeyValueList(){
+	private JButton setupUpdateButton(){
+		JButton update_button = new JButton("Update");
+		update_button.setMaximumSize(new Dimension(300,30));
+		update_button.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("update");
+			}
+		});
+
+		return update_button;
+	}
+
+	private Component setupKeyTextField() {
+		key_field = new JTextField();
+		key_field.setMaximumSize(new Dimension(300, 30));
+		return key_field;
+	}
+
+	private Component setupValueTextField() {
+		value_field = new JTextField();
+		value_field.setMaximumSize(new Dimension(300, 30));
+		return value_field;
+	}
+
+
+	private JButton setupAddButton(){
+		JButton add_button = new JButton("Add");
+		add_button.setMaximumSize(new Dimension(100, 30));
+		add_button.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("add");
+				controller.add("Hello", "World");
+				((DefaultTableModel)table.getModel()).addRow(new Object[]{"Hello", "World"});
+				controller.ping();
+			}
+		});
+
+		return add_button;
+	}
+
+	private Component setupClearButton() {
+		JButton clear_button = new JButton("Clear");
+		clear_button.setMaximumSize(new Dimension(100, 30));
+		clear_button.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("clear");
+			}
+		});
+
+		return clear_button;
+	}
+
+	private JButton setupDeleteButton(){
+		JButton delete_button = new JButton("Delete");
+		delete_button.setMaximumSize(new Dimension(300,30));
+		delete_button.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String key_to_remove = (String) table.getValueAt(table.getSelectedRow(), 0);
+				if ( controller.delete(key_to_remove) ){
+					((DefaultTableModel)table.getModel()).removeRow(table.getSelectedRow());
+
+				}
+				System.out.println("delete");
+			}
+		});
+
+		return delete_button;
+	}
+
+
+
+	private JButton setupCloseButton(){
+		JButton close_button = new JButton("close");
+		close_button.setMaximumSize(new Dimension(300,30));
+		close_button.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.exit(0);
+			}
+		});
+
+		return close_button;
+	}
+
+	private JScrollPane setupKeyValueList(){
 		String[] table_headings = {"Key", "Value"};
 		int row_count = 0;
 
@@ -98,6 +240,14 @@ public class MainEditorClass extends JFrame {
 
 		table.setModel(table_model);
 
+		//For ordering
+		sorter = new TableRowSorter<TableModel>(table_model);
+		table.setRowSorter(sorter);
+		ArrayList<RowSorter.SortKey> key = new ArrayList<RowSorter.SortKey>();
+		key.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));//default is ascending order of first column i.e. alphabetical order of words
+		sorter.setSortKeys(key);
+		sorter.sort();
+
 		table.getTableHeader().setReorderingAllowed(false);
 
 		//Alignment for the cells http://stackoverflow.com/a/7433758
@@ -109,94 +259,11 @@ public class MainEditorClass extends JFrame {
 		//adds scroll pane to table to panel
 		scroll_pane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-		ui_panel.add(scroll_pane);
 		scroll_pane.setVisible(true);
-		scroll_pane.setLocation(50,50);
-		scroll_pane.setSize(550, 400);
+		scroll_pane.setMinimumSize(new Dimension(550, 400));
 
-	}
+		return scroll_pane;
 
-	private void setupConnectButton(){
-		JButton connection_button = new JButton("Connect");
-		connection_button.setSize(100,50);
-		connection_button.setLocation(650, 50);
-		ui_panel.add(connection_button);
-		connection_button.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				System.out.println("connect");
-			}
-		});
-	}
-
-	private void setupAddFunctionality(){
-		JButton add_button = new JButton("Add");
-		add_button.setSize(100,50);
-		add_button.setLocation(650, 150);
-		ui_panel.add(add_button);
-		add_button.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				System.out.println("add");
-				controller.add("Hello", "World");
-				((DefaultTableModel)table.getModel()).addRow(new Object[]{"Hello", "World"});
-				controller.ping();
-			}
-		});
-		
-		JTextField key_textfield = new JTextField();
-		key_textfield.setSize(80, 50);
-		key_textfield.setLocation(650, 200);
-		
-	}
-
-	private void setupDeleteButton(){
-		JButton delete_button = new JButton("Delete");
-		delete_button.setSize(100,50);
-		delete_button.setLocation(650, 250);
-		ui_panel.add(delete_button);
-		delete_button.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String key_to_remove = (String) table.getValueAt(table.getSelectedRow(), 0);
-				if ( controller.delete(key_to_remove) ){
-					((DefaultTableModel)table.getModel()).removeRow(table.getSelectedRow());
-
-				}
-				System.out.println("delete");
-			}
-		});
-	}
-
-	private void setupUpdateButton(){
-		JButton update_button = new JButton("Update");
-		update_button.setSize(100,50);
-		update_button.setLocation(650, 350);
-		ui_panel.add(update_button);
-		update_button.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				System.out.println("update");
-			}
-		});
-	}
-
-	private void setupCloseButton(){
-		JButton exit_button = new JButton("close");
-		exit_button.setSize(150,50);
-		exit_button.setLocation(650, 450);
-		ui_panel.add(exit_button);
-		exit_button.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				System.exit(0);
-			}
-		});
 	}
 
 }

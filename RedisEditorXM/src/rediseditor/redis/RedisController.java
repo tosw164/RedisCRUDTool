@@ -14,15 +14,15 @@ public class RedisController {
 	private static RedisController controller_instance;
 	private static Jedis jedis_instance;
 	
-	public static RedisController getInstance(){
-		if (jedis_instance == null){
-			controller_instance = new RedisController();
+	public static RedisController getInstance(String address){
+		if (address.equals("")){
+			controller_instance = new RedisController("localhost");
 		}
 		return controller_instance;
 	}
 	
-	private RedisController(){
-		jedis_instance=new Jedis("localhost");
+	private RedisController(String address){
+		jedis_instance=new Jedis(address);
 	}
 	
 	public static void newInstance(String connection_address){
