@@ -3,21 +3,14 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-import javax.sound.midi.ControllerEventListener;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -29,10 +22,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
-import com.sun.media.sound.ModelAbstractChannelMixer;
-
-import javafx.scene.layout.Border;
-import redis.clients.jedis.Jedis;
 import rediseditor.redis.RedisController;
 
 public class MainEditorClass extends JPanel {
@@ -72,8 +61,6 @@ public class MainEditorClass extends JPanel {
 
 	public MainEditorClass() {
 		controller = RedisController.getInstance(""); //TODO delete later
-
-		Box whole_cluster = Box.createHorizontalBox();
 
 		Box left_button_cluster = Box.createVerticalBox();
 		left_button_cluster.add(setupConnectButton());
