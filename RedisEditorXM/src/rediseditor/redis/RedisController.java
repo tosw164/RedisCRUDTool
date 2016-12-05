@@ -61,4 +61,9 @@ public class RedisController {
 		}
 		return false;
 	}
+	
+	public void add(String key, String value){
+		jedis_instance.set(key, value);
+	}
+	
 }

@@ -15,6 +15,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
@@ -23,7 +24,7 @@ import com.sun.media.sound.ModelAbstractChannelMixer;
 import redis.clients.jedis.Jedis;
 import rediseditor.redis.RedisController;
 
-public class TestEverything extends JFrame {
+public class MainEditorClass extends JFrame {
 
 	private JPanel ui_panel;
 	private JTable table;
@@ -37,7 +38,7 @@ public class TestEverything extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					TestEverything frame = new TestEverything();
+					MainEditorClass frame = new MainEditorClass();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -46,7 +47,7 @@ public class TestEverything extends JFrame {
 		});
 	}
 
-	public TestEverything() {
+	public MainEditorClass() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
 		setSize(800, 500);
@@ -65,7 +66,7 @@ public class TestEverything extends JFrame {
 
 		setupKeyValueList();
 		setupConnectButton();
-		setupAddButton();
+		setupAddFunctionality();
 		setupDeleteButton();
 		setupUpdateButton();
 		setupCloseButton();
@@ -106,7 +107,8 @@ public class TestEverything extends JFrame {
 		table.setDefaultRenderer(Integer.class, alignment_renderer);
 
 		//adds scroll pane to table to panel
-		scroll_pane = new JScrollPane(table);
+		scroll_pane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 		ui_panel.add(scroll_pane);
 		scroll_pane.setVisible(true);
 		scroll_pane.setLocation(50,50);
@@ -128,7 +130,7 @@ public class TestEverything extends JFrame {
 		});
 	}
 
-	private void setupAddButton(){
+	private void setupAddFunctionality(){
 		JButton add_button = new JButton("Add");
 		add_button.setSize(100,50);
 		add_button.setLocation(650, 150);
@@ -138,9 +140,16 @@ public class TestEverything extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("add");
+				controller.add("Hello", "World");
+				((DefaultTableModel)table.getModel()).addRow(new Object[]{"Hello", "World"});
 				controller.ping();
 			}
 		});
+		
+		JTextField key_textfield = new JTextField();
+		key_textfield.setSize(80, 50);
+		key_textfield.setLocation(650, 200);
+		
 	}
 
 	private void setupDeleteButton(){
@@ -178,8 +187,8 @@ public class TestEverything extends JFrame {
 
 	private void setupCloseButton(){
 		JButton exit_button = new JButton("close");
-		exit_button.setSize(50,50);
-		exit_button.setLocation(750, 450);
+		exit_button.setSize(150,50);
+		exit_button.setLocation(650, 450);
 		ui_panel.add(exit_button);
 		exit_button.addActionListener(new ActionListener() {
 
