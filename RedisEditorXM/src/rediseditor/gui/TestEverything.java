@@ -152,6 +152,11 @@ public class TestEverything extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				String key_to_remove = (String) table.getValueAt(table.getSelectedRow(), 0);
+				if ( controller.delete(key_to_remove) ){
+					((DefaultTableModel)table.getModel()).removeRow(table.getSelectedRow());
+
+				}
 				System.out.println("delete");
 			}
 		});

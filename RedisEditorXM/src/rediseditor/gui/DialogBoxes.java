@@ -8,6 +8,14 @@ public class DialogBoxes {
 
 	}
 
-	
+	public static boolean displayWarningPrompt(String message){
+		if( JOptionPane.showConfirmDialog(null, message, "Warning", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION){
+			return true;
+		} else{
+			return false;
+		}
+
+	}
+
 
 }
