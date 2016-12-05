@@ -71,6 +71,8 @@ public class MainEditorClass extends JPanel {
 		
 		left_button_cluster.add(setupConnectButton());
 		
+		//TODO should probably create dedicated refresh table button here
+		
 		createPadding(left_button_cluster, 1, 50);
 		
 		left_button_cluster.add(setupUpdateButton());
@@ -254,6 +256,8 @@ public class MainEditorClass extends JPanel {
 
 		return close_button;
 	}
+	
+	
 
 	private JScrollPane setupKeyValueList(){
 		String[] table_headings = {"Key", "Value"};
