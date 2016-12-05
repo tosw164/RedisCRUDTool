@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -63,29 +64,37 @@ public class MainEditorClass extends JPanel {
 		controller = RedisController.getInstance(""); //TODO delete later
 
 		Box left_button_cluster = Box.createVerticalBox();
+		
 		left_button_cluster.add(setupConnectButton());
-		left_button_cluster.add(Box.createRigidArea(new Dimension(1, 5)));
+		
+		createPadding(left_button_cluster, 1, 50);
+		
 		left_button_cluster.add(setupUpdateButton());
-		left_button_cluster.add(Box.createRigidArea(new Dimension(1, 10)));
+		
+		createPadding(left_button_cluster, 1, 30);
+		
 		left_button_cluster.add(new JLabel("Key:"));
 		left_button_cluster.add(setupKeyTextField());
-		left_button_cluster.add(Box.createRigidArea(new Dimension(1, 5)));
+		
+		createPadding(left_button_cluster, 1, 5);
+		
 		left_button_cluster.add(new JLabel("Value:"));
 		left_button_cluster.add(setupValueTextField());
-		left_button_cluster.add(Box.createRigidArea(new Dimension(1, 5)));
+		
+		createPadding(left_button_cluster, 1, 5);
 
 		Box add_clear_cluster = Box.createHorizontalBox();
 		add_clear_cluster.add(setupAddButton());
-		add_clear_cluster.add(Box.createRigidArea(new Dimension(5, 1)));
+		createPadding(add_clear_cluster, 5, 1);
 		add_clear_cluster.add(setupClearButton());
 
 		left_button_cluster.add(add_clear_cluster);
 
-		left_button_cluster.add(Box.createRigidArea(new Dimension(1, 10)));
+		createPadding(left_button_cluster, 1, 30);
 
 		left_button_cluster.add(setupDeleteButton());
 
-		left_button_cluster.add(Box.createRigidArea(new Dimension(1, 40)));
+		createPadding(left_button_cluster, 1, 70);
 
 		left_button_cluster.add(setupCloseButton());
 
@@ -93,6 +102,10 @@ public class MainEditorClass extends JPanel {
 		setLayout(new BorderLayout());
 		add(left_button_cluster, BorderLayout.WEST);
 		add(setupKeyValueList(), BorderLayout.CENTER);
+	}
+	
+	private void createPadding(Box source, int width, int height){
+		source.add(Box.createRigidArea(new Dimension(width, height)));
 	}
 
 	private JButton setupConnectButton(){
@@ -110,7 +123,7 @@ public class MainEditorClass extends JPanel {
 	}
 
 	private JButton setupUpdateButton(){
-		JButton update_button = new JButton("Update");
+		JButton update_button = new JButton("Update Selected");
 		update_button.setMaximumSize(new Dimension(300,30));
 		update_button.addActionListener(new ActionListener() {
 
@@ -169,7 +182,7 @@ public class MainEditorClass extends JPanel {
 	}
 
 	private JButton setupDeleteButton(){
-		JButton delete_button = new JButton("Delete");
+		JButton delete_button = new JButton("Delete Selected");
 		delete_button.setMaximumSize(new Dimension(300,30));
 		delete_button.addActionListener(new ActionListener() {
 
