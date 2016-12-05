@@ -1,9 +1,7 @@
 package redis;
 
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Set;
-
-import com.sun.corba.se.impl.oa.poa.ActiveObjectMap.Key;
 
 import gui.DialogBoxes;
 import redis.clients.jedis.Jedis;
@@ -42,12 +40,15 @@ public class RedisController {
 		System.out.println("Server ping results: " + jedis_instance.ping());
 	}
 	
-	public void printAllKeys(){
+	public ArrayList<String[]> getKeyValuePairData(){
 		Set<String> list_of_keys = jedis_instance.keys("*");
+		ArrayList<String[]> array_to_return = new ArrayList<String[]>();
+		
 		for(String key: list_of_keys){
-			System.out.println(key + "..." + jedis_instance.get(key));
-			
+			array_to_return.add(new String[]{key, jedis_instance.get(key)});
+			System.out.println(key + "\t" + jedis_instance.get(key));
 		}
+		return array_to_return;
 	}
 	
 }
