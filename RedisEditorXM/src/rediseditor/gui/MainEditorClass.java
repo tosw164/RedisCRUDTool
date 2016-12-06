@@ -62,17 +62,20 @@ public class MainEditorClass extends JPanel {
 		controller = RedisController.getInstance(""); //TODO delete later don't always want localhost
 
 
+		//Initialise container for button cluster on the left
 		Box left_button_cluster = Box.createVerticalBox();
 
+		//Setup refresh table button at the top with 50 pixel padding below
 		left_button_cluster.add(setupRefreshButtton());
 		createPadding(left_button_cluster, 1, 50);
 
+		//Setup save and cancel buttons for when user is editing cell
 		left_button_cluster.add(setupSaveButton());
 		createPadding(left_button_cluster, 1, 10);
 		left_button_cluster.add(setupCancelButton());
 		createPadding(left_button_cluster, 1, 50);
-		
-		
+
+
 		left_button_cluster.add(setupAddButton());
 		createPadding(left_button_cluster, 1, 10);
 		left_button_cluster.add(setupDeleteButton());
@@ -86,15 +89,15 @@ public class MainEditorClass extends JPanel {
 		add(left_button_cluster, BorderLayout.WEST);
 		add(setupKeyValueList(), BorderLayout.CENTER);
 	}
-	
-	
+
+
 	private void createPadding(Box source, int width, int height){
 		source.add(Box.createRigidArea(new Dimension(width, height)));
 	}
-	
+
 	private JButton setupRefreshButtton(){
 		JButton refresh_button = new JButton("Refresh Table");
-//		refresh_button.setMaximumSize(new Dimension(300,30));
+		refresh_button.setMaximumSize(new Dimension(300,30));
 		refresh_button.addActionListener(new ActionListener() {
 
 			@Override
@@ -108,7 +111,7 @@ public class MainEditorClass extends JPanel {
 
 	private JButton setupSaveButton(){
 		JButton save_button = new JButton("save");
-//		save_button.setMaximumSize(new Dimension(300,30));
+		save_button.setMaximumSize(new Dimension(300,30));
 		save_button.addActionListener(new ActionListener() {
 
 			@Override
@@ -120,10 +123,10 @@ public class MainEditorClass extends JPanel {
 
 		return save_button;
 	}
-	
+
 	private JButton setupCancelButton(){
 		JButton cancel_button = new JButton("cancel");
-//		cancel_button.setMaximumSize(new Dimension(300,30));
+		cancel_button.setMaximumSize(new Dimension(300,30));
 		cancel_button.addActionListener(new ActionListener() {
 
 			@Override
@@ -134,15 +137,15 @@ public class MainEditorClass extends JPanel {
 		});
 		return cancel_button;
 	}
-	
+
 	private JButton setupAddButton(){
 		JButton add_button = new JButton("Add New Row");
-//		add_button.setMaximumSize(new Dimension(300, 30));
+		add_button.setMaximumSize(new Dimension(300, 30));
 		add_button.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-//				refreshTable();
+				//				refreshTable();
 				System.out.println("add");
 				table_model.addRow(new Object[]{"", ""});
 			}
@@ -153,7 +156,7 @@ public class MainEditorClass extends JPanel {
 
 	private JButton setupDeleteButton(){
 		JButton delete_button = new JButton("Delete Selected");
-//		delete_button.setMaximumSize(new Dimension(300,30));
+		delete_button.setMaximumSize(new Dimension(300,30));
 		delete_button.addActionListener(new ActionListener() {
 
 			@Override
@@ -161,7 +164,7 @@ public class MainEditorClass extends JPanel {
 				int index_selected = table.getSelectedRow();
 				if (index_selected != -1){
 					String key_to_remove = (String) table.getValueAt(table.getSelectedRow(), 0);
-					if ( controller.delete(key_to_remove) ){
+					if ( controller.deletePrompt(key_to_remove) ){
 						refreshTable();
 					}
 				} 				
@@ -170,9 +173,9 @@ public class MainEditorClass extends JPanel {
 
 		return delete_button;
 	}
-	
+
 	//TODO Make this button better (actually do something)
-	
+
 	private JButton setupConnectButton(){
 		JButton connect_button = new JButton("Connect");
 		return connect_button;
@@ -181,7 +184,7 @@ public class MainEditorClass extends JPanel {
 
 	private JButton setupCloseButton(){
 		JButton close_button = new JButton("close");
-//		close_button.setMaximumSize(new Dimension(300,30));
+		close_button.setMaximumSize(new Dimension(300,30));
 		close_button.addActionListener(new ActionListener() {
 
 			@Override
@@ -243,32 +246,72 @@ public class MainEditorClass extends JPanel {
 
 		return scroll_pane;
 	}
-	
-	
+
+
 	//------------------------------------------------------------------------------------------
 	//LOGIC SECTION
 	//------------------------------------------------------------------------------------------
-	
+
 	//TODO rename this
 	public void triggerSet(boolean something){
+
+		int column =table.getSelectedColumn();
+		int row=table.getSelectedRow();
+		Object old_key = table.getValueAt(row, 0);
+		Object old_value = table.getValueAt(row, 1);
+
+
+		//Save button pressed
 		if (something){
+			//TODO determine which cell edited logic here
+
+
+
+			//Key edited
+			if(column == 0){
+				if(old_key.toString().equals("")){
+					table.getCellEditor().stopCellEditing();
+					controller.add(table.getValueAt(row, column), old_value);
+					
+				} else {
+					String prompt_text="Are you sure you want to rename " + old_key + "?";
+					if (DialogBoxes.displayWarningPrompt(prompt_text)){
+
+						table.getCellEditor().stopCellEditing();
+						controller.add(table.getValueAt(row, column), old_value);
+						controller.delete(old_key);
+					}
+
+				}
+				//Value edited
+			} else {
+				table.getCellEditor().stopCellEditing();
+				controller.add(old_key, table.getValueAt(row, column));
+
+
+			}
+
+
+			//Cancel button pressed
+		} else {	
+
+			//Save current cell contents and overwrite with old value
 			table.getCellEditor().stopCellEditing();
-		} else {
-			int column =table.getSelectedColumn();
-			int row=table.getSelectedRow();
-			Object old_value=table.getValueAt(row, column);
-			table.getCellEditor().stopCellEditing();
-			table.setValueAt(old_value, row, column);
+			if (column == 0){
+				table.setValueAt(old_key, row, column);
+			} else  {
+				table.setValueAt(old_value, row, column);
+			}
 		}
 	}
-	
+
 	//TODO multithread this
 	private void refreshTable(){
 		this.remove(scroll_pane);
 		add(setupKeyValueList(), BorderLayout.CENTER);
 		frame.pack();
 	}
-	
+
 	//TODO rename this
 	private void yesnobuttonpress(boolean save){
 		if (table.isEditing()){

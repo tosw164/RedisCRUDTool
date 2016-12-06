@@ -58,16 +58,20 @@ public class RedisController {
 		return jedis_instance.keys("*");
 	}
 	
-	public boolean delete(String key){
-		if (DialogBoxes.displayWarningPrompt("Are you sure you want to delete ["+key+"] ?")){
-			jedis_instance.del(key);
+	public boolean deletePrompt(Object key){
+		if (DialogBoxes.displayWarningPrompt("Are you sure you want to delete ["+key.toString()+"] ?")){
+			delete(key);
 			return true;
 		}
 		return false;
 	}
 	
-	public void add(String key, String value){
-		jedis_instance.set(key, value);
+	public void delete(Object key){
+		jedis_instance.del(key.toString());
+	}
+	
+	public void add(Object key, Object value){
+		jedis_instance.set(key.toString(), value.toString());
 	}
 	
 }
