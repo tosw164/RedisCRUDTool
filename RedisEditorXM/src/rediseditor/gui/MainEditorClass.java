@@ -31,12 +31,10 @@ public class MainEditorClass extends JPanel {
 
 	private JTable table;
 	private JScrollPane scroll_pane;
-	private JTextField value_field;
-	private JTextField key_field;
 	private TableRowSorter<TableModel> sorter;
+	private DefaultTableModel table_model;
 	private static RedisController controller;
 	private static JFrame frame;
-
 
 	public static void main(String[] args) {		
 		EventQueue.invokeLater(new Runnable() {
@@ -59,69 +57,28 @@ public class MainEditorClass extends JPanel {
 		frame.pack();
 		frame.setVisible(true);
 	}
-	
-	private void yesnobuttonpress(boolean save){
-		if (table.isEditing()){
-			if (save){
-				triggerSet(true);
-			} else {
-				triggerSet(false);
-			}
-		}
-	}
 
 	public MainEditorClass() {
-		controller = RedisController.getInstance(""); //TODO delete later
+		controller = RedisController.getInstance(""); //TODO delete later don't always want localhost
+
 
 		Box left_button_cluster = Box.createVerticalBox();
-		
+
+		left_button_cluster.add(setupRefreshButtton());
 		createPadding(left_button_cluster, 1, 50);
 
 		left_button_cluster.add(setupSaveButton());
-		
-		JButton cancel_button = new JButton("cancel");
-		cancel_button.setMaximumSize(new Dimension(300,30));
-		cancel_button.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				System.out.println("cancel");
-				yesnobuttonpress(false);
-			}
-		});
-		left_button_cluster.add(cancel_button);
-		
-		//TODO should probably create dedicated refresh table button here
-		
+		createPadding(left_button_cluster, 1, 10);
+		left_button_cluster.add(setupCancelButton());
 		createPadding(left_button_cluster, 1, 50);
 		
-		left_button_cluster.add(setupRefreshButtton());
 		
-		createPadding(left_button_cluster, 1, 30);
-		
-		left_button_cluster.add(new JLabel("Key:"));
-		left_button_cluster.add(setupKeyTextField());
-		
-		createPadding(left_button_cluster, 1, 5);
-		
-		left_button_cluster.add(new JLabel("Value:"));
-		left_button_cluster.add(setupValueTextField());
-		
-		createPadding(left_button_cluster, 1, 5);
-
-		Box add_clear_cluster = Box.createHorizontalBox();
-		add_clear_cluster.add(setupAddButton());
-		createPadding(add_clear_cluster, 5, 1);
-		add_clear_cluster.add(setupClearButton());
-
-		left_button_cluster.add(add_clear_cluster);
-
-		createPadding(left_button_cluster, 1, 30);
-
+		left_button_cluster.add(setupAddButton());
+		createPadding(left_button_cluster, 1, 10);
 		left_button_cluster.add(setupDeleteButton());
-
 		createPadding(left_button_cluster, 1, 70);
 
+		left_button_cluster.add(setupConnectButton());
 		left_button_cluster.add(setupCloseButton());
 
 
@@ -130,35 +87,14 @@ public class MainEditorClass extends JPanel {
 		add(setupKeyValueList(), BorderLayout.CENTER);
 	}
 	
-	private void refreshTable(){
-		this.remove(scroll_pane);
-		add(setupKeyValueList(), BorderLayout.CENTER);
-		frame.pack();
-	}
 	
 	private void createPadding(Box source, int width, int height){
 		source.add(Box.createRigidArea(new Dimension(width, height)));
 	}
-
-	private JButton setupSaveButton(){
-		// TODO haven't done.
-		JButton save_button = new JButton("save");
-		save_button.setMaximumSize(new Dimension(300,30));
-		save_button.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				System.out.println("save");
-				yesnobuttonpress(true);
-			}
-		});
-
-		return save_button;
-	}
-
+	
 	private JButton setupRefreshButtton(){
 		JButton refresh_button = new JButton("Refresh Table");
-		refresh_button.setMaximumSize(new Dimension(300,30));
+//		refresh_button.setMaximumSize(new Dimension(300,30));
 		refresh_button.addActionListener(new ActionListener() {
 
 			@Override
@@ -170,79 +106,54 @@ public class MainEditorClass extends JPanel {
 		return refresh_button;
 	}
 
-	private Component setupKeyTextField() {
-		key_field = new JTextField();
-		key_field.setMaximumSize(new Dimension(300, 30));
-		return key_field;
-	}
+	private JButton setupSaveButton(){
+		JButton save_button = new JButton("save");
+//		save_button.setMaximumSize(new Dimension(300,30));
+		save_button.addActionListener(new ActionListener() {
 
-	private Component setupValueTextField() {
-		value_field = new JTextField();
-		value_field.setMaximumSize(new Dimension(300, 30));
-		return value_field;
-	}
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("save");
+				yesnobuttonpress(true);
+			}
+		});
 
+		return save_button;
+	}
+	
+	private JButton setupCancelButton(){
+		JButton cancel_button = new JButton("cancel");
+//		cancel_button.setMaximumSize(new Dimension(300,30));
+		cancel_button.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("cancel");
+				yesnobuttonpress(false);
+			}
+		});
+		return cancel_button;
+	}
+	
 	private JButton setupAddButton(){
-		JButton add_button = new JButton("Add");
-		add_button.setMaximumSize(new Dimension(100, 30));
+		JButton add_button = new JButton("Add New Row");
+//		add_button.setMaximumSize(new Dimension(300, 30));
 		add_button.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				addButtonLogic();
-				clearTextFields();
-				refreshTable();
+//				refreshTable();
+				System.out.println("add");
+				table_model.addRow(new Object[]{"", ""});
 			}
 		});
 
 		return add_button;
 	}
-	
-	private void addButtonLogic(){
-		String key_entered = key_field.getText();
-		String value_entered = value_field.getText();
-		
-		Set<String> list_of_keys = controller.getKeys();
-		boolean key_already_present = false;
-		for(String key: list_of_keys){
-			if (key_entered.equals(key)){
-				key_already_present = true;
-			}
-		}
-		if (key_already_present){
-			boolean to_overwrite = DialogBoxes.displayWarningPrompt("Key already exists, do you want to overwrite?");
-			if (to_overwrite){
-				controller.add(key_entered, value_entered);
-			}
-		} else { //Key not already present in database
-			if (DialogBoxes.displayConfirmationPrompt("Are you sure you want to add this key value pair?")){
-				controller.add(key_entered, value_entered);
-			}
-		}
-	}
-	
-	private void clearTextFields(){
-		key_field.setText("");
-		value_field.setText("");
-	}
-
-	private Component setupClearButton() {
-		JButton clear_button = new JButton("Clear");
-		clear_button.setMaximumSize(new Dimension(100, 30));
-		clear_button.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				clearTextFields();
-			}
-		});
-
-		return clear_button;
-	}
 
 	private JButton setupDeleteButton(){
 		JButton delete_button = new JButton("Delete Selected");
-		delete_button.setMaximumSize(new Dimension(300,30));
+//		delete_button.setMaximumSize(new Dimension(300,30));
 		delete_button.addActionListener(new ActionListener() {
 
 			@Override
@@ -259,11 +170,18 @@ public class MainEditorClass extends JPanel {
 
 		return delete_button;
 	}
+	
+	//TODO Make this button better (actually do something)
+	
+	private JButton setupConnectButton(){
+		JButton connect_button = new JButton("Connect");
+		return connect_button;
+	}
 
 
 	private JButton setupCloseButton(){
 		JButton close_button = new JButton("close");
-		close_button.setMaximumSize(new Dimension(300,30));
+//		close_button.setMaximumSize(new Dimension(300,30));
 		close_button.addActionListener(new ActionListener() {
 
 			@Override
@@ -274,8 +192,7 @@ public class MainEditorClass extends JPanel {
 
 		return close_button;
 	}
-	
-	private TableModel table_model;
+
 
 	private JScrollPane setupKeyValueList(){
 		String[] table_headings = {"Key", "Value"};
@@ -295,13 +212,7 @@ public class MainEditorClass extends JPanel {
 		};
 
 		table = new JTable(table_model);
-		table.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e){
-				System.out.println("row:" + table.rowAtPoint(e.getPoint()) + "col:" + table.columnAtPoint(e.getPoint()));
-			}
-		});
-		
+
 		for (String[] s: controller.getKeyValuePairData()){
 			((DefaultTableModel) table_model).addRow(s);
 		}
@@ -331,8 +242,14 @@ public class MainEditorClass extends JPanel {
 		scroll_pane.setMinimumSize(new Dimension(550, 400));
 
 		return scroll_pane;
-
 	}
+	
+	
+	//------------------------------------------------------------------------------------------
+	//LOGIC SECTION
+	//------------------------------------------------------------------------------------------
+	
+	//TODO rename this
 	public void triggerSet(boolean something){
 		if (something){
 			table.getCellEditor().stopCellEditing();
@@ -344,5 +261,22 @@ public class MainEditorClass extends JPanel {
 			table.setValueAt(old_value, row, column);
 		}
 	}
-
+	
+	//TODO multithread this
+	private void refreshTable(){
+		this.remove(scroll_pane);
+		add(setupKeyValueList(), BorderLayout.CENTER);
+		frame.pack();
+	}
+	
+	//TODO rename this
+	private void yesnobuttonpress(boolean save){
+		if (table.isEditing()){
+			if (save){
+				triggerSet(true);
+			} else {
+				triggerSet(false);
+			}
+		}
+	}
 }
