@@ -9,7 +9,6 @@ import java.security.KeyFactory;
 import java.util.ArrayList;
 import java.util.Set;
 
-import javax.management.openmbean.KeyAlreadyExistsException;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -25,8 +24,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
-import org.omg.CORBA.portable.ValueFactory;
-
 import rediseditor.redis.RedisController;
 
 public class MainEditorClass extends JPanel {
@@ -36,12 +33,11 @@ public class MainEditorClass extends JPanel {
 	private JTextField value_field;
 	private JTextField key_field;
 	private TableRowSorter<TableModel> sorter;
+	private Box box;
 	private static RedisController controller;
 	private static JFrame frame;
 
-	/**
-	 * Launch the application.
-	 */
+
 	public static void main(String[] args) {		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -69,6 +65,8 @@ public class MainEditorClass extends JPanel {
 
 		Box left_button_cluster = Box.createVerticalBox();
 		
+		createPadding(left_button_cluster, 1, 50);
+
 		left_button_cluster.add(setupConnectButton());
 		
 		//TODO should probably create dedicated refresh table button here
@@ -143,6 +141,10 @@ public class MainEditorClass extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				//TODO need to create window with key and value fields that user enters
+				int row_selected = table.getSelectedRow();
+				if (row_selected != -1){
+//					testo(key_field.getText(), value_field.getText());
+				}
 				System.out.println("update");
 				refreshTable();
 			}
@@ -150,6 +152,22 @@ public class MainEditorClass extends JPanel {
 
 		return update_button;
 	}
+	
+//	private void testo(String key, String value){
+//		box = Box.createHorizontalBox();
+//		createPadding(box, 210, 1);
+//		box.add(new JLabel("Key: "));
+//		box.add(new JTextField());
+//		createPadding(box, 10, 1);
+//		box.add(new JLabel("value: "));
+//		box.add(new JTextField());
+//		createPadding(box, 10, 1);
+//		box.add(new JButton("Update"));
+//		createPadding(box, 10, 1);
+//		box.add(new JButton("Cancel"));
+//		add(box, BorderLayout.NORTH);
+//		
+//	}
 
 	private Component setupKeyTextField() {
 		key_field = new JTextField();
@@ -234,13 +252,12 @@ public class MainEditorClass extends JPanel {
 					if ( controller.delete(key_to_remove) ){
 						refreshTable();
 					}
-				}
+				} 				
 			}
 		});
 
 		return delete_button;
 	}
-
 
 
 	private JButton setupCloseButton(){
@@ -265,7 +282,7 @@ public class MainEditorClass extends JPanel {
 
 		DefaultTableModel table_model = new DefaultTableModel(table_headings, row_count){
 			public boolean isCellEditable(int row, int column){
-				return false;
+				return true;
 			}
 
 			public Class getColumnClass(int column){
