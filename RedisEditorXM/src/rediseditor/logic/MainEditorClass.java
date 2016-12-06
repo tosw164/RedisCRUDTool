@@ -204,6 +204,7 @@ public class MainEditorClass extends JPanel {
 	private void closeButtonLogic(){
 		System.exit(0);
 	}
+	
 	private JScrollPane setupKeyValueList(){
 		String[] table_headings = {"Key", "Value"};
 		int row_count = 0;
@@ -225,8 +226,22 @@ public class MainEditorClass extends JPanel {
 		JTextField cell = new JTextField();
 		final TableCellEditor cell_editor = new DefaultCellEditor(cell);
 		table.getColumnModel().getColumn(0).setCellEditor(cell_editor);
-		cell.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "PressSaveButton");
-		cell.getActionMap().put("PressSaveButton", new SaveButtonAction());
+		table.getColumnModel().getColumn(1).setCellEditor(cell_editor);
+		
+		InputMap input_map = cell.getInputMap(JComponent.WHEN_FOCUSED);
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "PressSaveButton");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "PressCancelButton");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0), "DoNothing");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "DoNothing");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, 0), "DoNothing");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "DoNothing");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, 0), "DoNothing");
+
+		ActionMap action_map = cell.getActionMap();
+		action_map.put("PressSaveButton", new SaveButtonAction());
+		action_map.put("PressCancelButton", new CancelButtonAction());
+		action_map.put("DoNothing", new DoNothingAction());
+
 
 		//		editKeyBindings();
 
@@ -342,6 +357,23 @@ public class MainEditorClass extends JPanel {
 		public void actionPerformed(ActionEvent e) {
 			System.out.println("yes");
 			yesnobuttonpress(true);
+		}
+	}
+	
+	private class CancelButtonAction extends AbstractAction{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			System.out.println("no");
+			yesnobuttonpress(false);
+		}
+	}
+	
+	private class DoNothingAction extends AbstractAction{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			System.out.println("nill");
 		}
 	}
 }
