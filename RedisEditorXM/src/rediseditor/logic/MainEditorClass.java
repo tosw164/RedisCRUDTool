@@ -74,7 +74,7 @@ public class MainEditorClass extends JPanel {
 		frame = new JFrame("RedisEditor");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
-		frame.setPreferredSize(new Dimension(1000, 800));
+		frame.setPreferredSize(new Dimension(1200, 500));
 		frame.add(new MainEditorClass());
 		frame.pack();
 		frame.setVisible(true);
@@ -250,6 +250,9 @@ public class MainEditorClass extends JPanel {
 		}
 
 		table.setModel(table_model);
+		table.getColumnModel().getColumn(0).setPreferredWidth(300);
+		table.getColumnModel().getColumn(1).setPreferredWidth(900);
+
 
 		//For ordering
 		sorter = new TableRowSorter<TableModel>(table_model);
