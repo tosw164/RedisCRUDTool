@@ -5,7 +5,8 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.security.KeyFactory;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -33,7 +34,6 @@ public class MainEditorClass extends JPanel {
 	private JTextField value_field;
 	private JTextField key_field;
 	private TableRowSorter<TableModel> sorter;
-	private Box box;
 	private static RedisController controller;
 	private static JFrame frame;
 
@@ -59,6 +59,16 @@ public class MainEditorClass extends JPanel {
 		frame.pack();
 		frame.setVisible(true);
 	}
+	
+	private void yesnobuttonpress(boolean save){
+		if (table.isEditing()){
+			if (save){
+				triggerSet(true);
+			} else {
+				triggerSet(false);
+			}
+		}
+	}
 
 	public MainEditorClass() {
 		controller = RedisController.getInstance(""); //TODO delete later
@@ -67,13 +77,25 @@ public class MainEditorClass extends JPanel {
 		
 		createPadding(left_button_cluster, 1, 50);
 
-		left_button_cluster.add(setupConnectButton());
+		left_button_cluster.add(setupSaveButton());
+		
+		JButton cancel_button = new JButton("cancel");
+		cancel_button.setMaximumSize(new Dimension(300,30));
+		cancel_button.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("cancel");
+				yesnobuttonpress(false);
+			}
+		});
+		left_button_cluster.add(cancel_button);
 		
 		//TODO should probably create dedicated refresh table button here
 		
 		createPadding(left_button_cluster, 1, 50);
 		
-		left_button_cluster.add(setupUpdateButton());
+		left_button_cluster.add(setupRefreshButtton());
 		
 		createPadding(left_button_cluster, 1, 30);
 		
@@ -118,56 +140,35 @@ public class MainEditorClass extends JPanel {
 		source.add(Box.createRigidArea(new Dimension(width, height)));
 	}
 
-	private JButton setupConnectButton(){
+	private JButton setupSaveButton(){
 		// TODO haven't done.
-		JButton connection_button = new JButton("Connect");
-		connection_button.setMaximumSize(new Dimension(300,30));
-		connection_button.addActionListener(new ActionListener() {
+		JButton save_button = new JButton("save");
+		save_button.setMaximumSize(new Dimension(300,30));
+		save_button.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("connect");
+				System.out.println("save");
+				yesnobuttonpress(true);
 			}
 		});
 
-		return connection_button;
+		return save_button;
 	}
 
-	private JButton setupUpdateButton(){
-		JButton update_button = new JButton("Update Selected");
-		update_button.setMaximumSize(new Dimension(300,30));
-		update_button.addActionListener(new ActionListener() {
+	private JButton setupRefreshButtton(){
+		JButton refresh_button = new JButton("Refresh Table");
+		refresh_button.setMaximumSize(new Dimension(300,30));
+		refresh_button.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				//TODO need to create window with key and value fields that user enters
-				int row_selected = table.getSelectedRow();
-				if (row_selected != -1){
-//					testo(key_field.getText(), value_field.getText());
-				}
-				System.out.println("update");
 				refreshTable();
 			}
 		});
 
-		return update_button;
+		return refresh_button;
 	}
-	
-//	private void testo(String key, String value){
-//		box = Box.createHorizontalBox();
-//		createPadding(box, 210, 1);
-//		box.add(new JLabel("Key: "));
-//		box.add(new JTextField());
-//		createPadding(box, 10, 1);
-//		box.add(new JLabel("value: "));
-//		box.add(new JTextField());
-//		createPadding(box, 10, 1);
-//		box.add(new JButton("Update"));
-//		createPadding(box, 10, 1);
-//		box.add(new JButton("Cancel"));
-//		add(box, BorderLayout.NORTH);
-//		
-//	}
 
 	private Component setupKeyTextField() {
 		key_field = new JTextField();
@@ -274,13 +275,13 @@ public class MainEditorClass extends JPanel {
 		return close_button;
 	}
 	
-	
+	private TableModel table_model;
 
 	private JScrollPane setupKeyValueList(){
 		String[] table_headings = {"Key", "Value"};
 		int row_count = 0;
 
-		DefaultTableModel table_model = new DefaultTableModel(table_headings, row_count){
+		table_model = new DefaultTableModel(table_headings, row_count){
 			public boolean isCellEditable(int row, int column){
 				return true;
 			}
@@ -294,9 +295,15 @@ public class MainEditorClass extends JPanel {
 		};
 
 		table = new JTable(table_model);
-
+		table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e){
+				System.out.println("row:" + table.rowAtPoint(e.getPoint()) + "col:" + table.columnAtPoint(e.getPoint()));
+			}
+		});
+		
 		for (String[] s: controller.getKeyValuePairData()){
-			table_model.addRow(s);
+			((DefaultTableModel) table_model).addRow(s);
 		}
 
 		table.setModel(table_model);
@@ -325,6 +332,17 @@ public class MainEditorClass extends JPanel {
 
 		return scroll_pane;
 
+	}
+	public void triggerSet(boolean something){
+		if (something){
+			table.getCellEditor().stopCellEditing();
+		} else {
+			int column =table.getSelectedColumn();
+			int row=table.getSelectedRow();
+			Object old_value=table.getValueAt(row, column);
+			table.getCellEditor().stopCellEditing();
+			table.setValueAt(old_value, row, column);
+		}
 	}
 
 }
