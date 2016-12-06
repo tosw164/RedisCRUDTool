@@ -1,40 +1,62 @@
-package rediseditor.gui;
+package rediseditor.logic;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Set;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.Box;
+import javax.swing.DefaultCellEditor;
+import javax.swing.InputMap;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
+import rediseditor.gui.DialogBoxes;
+import rediseditor.gui.UiInitialise;
 import rediseditor.redis.RedisController;
 
 public class MainEditorClass extends JPanel {
 
+	private static JFrame frame;
+	private static RedisController controller;
+
+	private JButton refresh_button;
+	private JButton save_button;
+	private JButton cancel_button;
+	private JButton addrow_button;
+	private JButton deleterow_button;
+	private JButton connect_button;
+	private JButton close_button;
+
 	private JTable table;
+	private DefaultTableModel table_model;
 	private JScrollPane scroll_pane;
 	private TableRowSorter<TableModel> sorter;
-	private DefaultTableModel table_model;
-	private static RedisController controller;
-	private static JFrame frame;
+
+
 
 	public static void main(String[] args) {		
 		EventQueue.invokeLater(new Runnable() {
@@ -61,28 +83,28 @@ public class MainEditorClass extends JPanel {
 	public MainEditorClass() {
 		controller = RedisController.getInstance(""); //TODO delete later don't always want localhost
 
+		initialise_button_components();
 
 		//Initialise container for button cluster on the left
 		Box left_button_cluster = Box.createVerticalBox();
 
 		//Setup refresh table button at the top with 50 pixel padding below
-		left_button_cluster.add(setupRefreshButtton());
-		createPadding(left_button_cluster, 1, 50);
+		left_button_cluster.add(refresh_button);
+		left_button_cluster.add(UiInitialise.createPadding(1, 50));
 
 		//Setup save and cancel buttons for when user is editing cell
-		left_button_cluster.add(setupSaveButton());
-		createPadding(left_button_cluster, 1, 10);
-		left_button_cluster.add(setupCancelButton());
-		createPadding(left_button_cluster, 1, 50);
+		left_button_cluster.add(save_button);
+		left_button_cluster.add(UiInitialise.createPadding(1, 10));
+		left_button_cluster.add(cancel_button);
+		left_button_cluster.add(UiInitialise.createPadding(1, 50));
 
+		left_button_cluster.add(addrow_button);
+		left_button_cluster.add(UiInitialise.createPadding(1, 10));
+		left_button_cluster.add(deleterow_button);
+		left_button_cluster.add(UiInitialise.createPadding(1, 70));
 
-		left_button_cluster.add(setupAddButton());
-		createPadding(left_button_cluster, 1, 10);
-		left_button_cluster.add(setupDeleteButton());
-		createPadding(left_button_cluster, 1, 70);
-
-		left_button_cluster.add(setupConnectButton());
-		left_button_cluster.add(setupCloseButton());
+		left_button_cluster.add(connect_button);
+		left_button_cluster.add(close_button);
 
 
 		setLayout(new BorderLayout());
@@ -90,113 +112,98 @@ public class MainEditorClass extends JPanel {
 		add(setupKeyValueList(), BorderLayout.CENTER);
 	}
 
-
-	private void createPadding(Box source, int width, int height){
-		source.add(Box.createRigidArea(new Dimension(width, height)));
-	}
-
-	private JButton setupRefreshButtton(){
-		JButton refresh_button = new JButton("Refresh Table");
-		refresh_button.setMaximumSize(new Dimension(300,30));
+	private void initialise_button_components(){
+		refresh_button = UiInitialise.createRefreshButton();
 		refresh_button.addActionListener(new ActionListener() {
-
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				refreshButtonLogic();
+			}
+		});
+
+		save_button = UiInitialise.createSaveButton();
+		save_button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				saveButtonLogic();
+			}
+		});
+
+		cancel_button = UiInitialise.createCancelButton();
+		cancel_button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				cancelButtonLogic();
+			}
+		});
+
+		addrow_button = UiInitialise.createAddRowButton();
+		addrow_button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				addRowButtonLogic();
+			}
+		});
+
+		deleterow_button = UiInitialise.createDeleteRowButton();
+		deleterow_button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				deleteRowButtonLogic();
+			}
+		});
+
+		connect_button = UiInitialise.createConnectButton();
+		connect_button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				connectButtonLogic();
+			}
+		});
+
+		close_button = UiInitialise.createCloseButton();
+		close_button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				closeButtonLogic();
+			}
+		});
+	}
+
+	private void refreshButtonLogic(){
+		refreshTable();
+	}
+
+	private void saveButtonLogic(){
+		System.out.println("save");
+		yesnobuttonpress(true);
+	}
+
+	private void cancelButtonLogic(){
+		yesnobuttonpress(false);
+	}
+
+	private void addRowButtonLogic(){
+		table_model.addRow(new Object[]{"", ""});
+	}
+
+	private void deleteRowButtonLogic(){
+		int index_selected = table.getSelectedRow();
+		if (index_selected != -1){
+			String key_to_remove = (String) table.getValueAt(table.getSelectedRow(), 0);
+			if ( controller.deletePrompt(key_to_remove) ){
 				refreshTable();
 			}
-		});
-
-		return refresh_button;
+		} 		
+	}
+	
+	private void connectButtonLogic(){
+		
 	}
 
-	private JButton setupSaveButton(){
-		JButton save_button = new JButton("save");
-		save_button.setMaximumSize(new Dimension(300,30));
-		save_button.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				System.out.println("save");
-				yesnobuttonpress(true);
-			}
-		});
-
-		return save_button;
+	private void closeButtonLogic(){
+		System.exit(0);
 	}
-
-	private JButton setupCancelButton(){
-		JButton cancel_button = new JButton("cancel");
-		cancel_button.setMaximumSize(new Dimension(300,30));
-		cancel_button.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				System.out.println("cancel");
-				yesnobuttonpress(false);
-			}
-		});
-		return cancel_button;
-	}
-
-	private JButton setupAddButton(){
-		JButton add_button = new JButton("Add New Row");
-		add_button.setMaximumSize(new Dimension(300, 30));
-		add_button.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				//				refreshTable();
-				System.out.println("add");
-				table_model.addRow(new Object[]{"", ""});
-			}
-		});
-
-		return add_button;
-	}
-
-	private JButton setupDeleteButton(){
-		JButton delete_button = new JButton("Delete Selected");
-		delete_button.setMaximumSize(new Dimension(300,30));
-		delete_button.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				int index_selected = table.getSelectedRow();
-				if (index_selected != -1){
-					String key_to_remove = (String) table.getValueAt(table.getSelectedRow(), 0);
-					if ( controller.deletePrompt(key_to_remove) ){
-						refreshTable();
-					}
-				} 				
-			}
-		});
-
-		return delete_button;
-	}
-
-	//TODO Make this button better (actually do something)
-
-	private JButton setupConnectButton(){
-		JButton connect_button = new JButton("Connect");
-		return connect_button;
-	}
-
-
-	private JButton setupCloseButton(){
-		JButton close_button = new JButton("close");
-		close_button.setMaximumSize(new Dimension(300,30));
-		close_button.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				System.exit(0);
-			}
-		});
-
-		return close_button;
-	}
-
-
 	private JScrollPane setupKeyValueList(){
 		String[] table_headings = {"Key", "Value"};
 		int row_count = 0;
@@ -215,6 +222,13 @@ public class MainEditorClass extends JPanel {
 		};
 
 		table = new JTable(table_model);
+		JTextField cell = new JTextField();
+		final TableCellEditor cell_editor = new DefaultCellEditor(cell);
+		table.getColumnModel().getColumn(0).setCellEditor(cell_editor);
+		cell.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "PressSaveButton");
+		cell.getActionMap().put("PressSaveButton", new SaveButtonAction());
+
+		//		editKeyBindings();
 
 		for (String[] s: controller.getKeyValuePairData()){
 			((DefaultTableModel) table_model).addRow(s);
@@ -272,7 +286,7 @@ public class MainEditorClass extends JPanel {
 				if(old_key.toString().equals("")){
 					table.getCellEditor().stopCellEditing();
 					controller.add(table.getValueAt(row, column), old_value);
-					
+
 				} else {
 					String prompt_text="Are you sure you want to rename " + old_key + "?";
 					if (DialogBoxes.displayWarningPrompt(prompt_text)){
@@ -280,15 +294,14 @@ public class MainEditorClass extends JPanel {
 						table.getCellEditor().stopCellEditing();
 						controller.add(table.getValueAt(row, column), old_value);
 						controller.delete(old_key);
+					} else {
+						triggerSet(false);
 					}
-
 				}
 				//Value edited
 			} else {
 				table.getCellEditor().stopCellEditing();
 				controller.add(old_key, table.getValueAt(row, column));
-
-
 			}
 
 
@@ -320,6 +333,15 @@ public class MainEditorClass extends JPanel {
 			} else {
 				triggerSet(false);
 			}
+		}
+	}
+
+	private class SaveButtonAction extends AbstractAction{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			System.out.println("yes");
+			yesnobuttonpress(true);
 		}
 	}
 }
