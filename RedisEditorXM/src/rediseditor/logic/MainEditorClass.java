@@ -24,6 +24,9 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
+import org.omg.PortableServer.THREAD_POLICY_ID;
+
+import redis.clients.jedis.exceptions.JedisNoReachableClusterNodeException;
 import rediseditor.gui.DialogBoxes;
 import rediseditor.gui.UiInitialise;
 import rediseditor.redis.RedisController;
@@ -43,7 +46,6 @@ public class MainEditorClass extends JPanel {
 	private DefaultTableModel table_model;
 	private JScrollPane scroll_pane;
 	private TableRowSorter<TableModel> sorter;
-
 
 
 	public static void main(String[] args) {		
@@ -95,6 +97,7 @@ public class MainEditorClass extends JPanel {
 		setLayout(new BorderLayout());
 		add(left_button_cluster, BorderLayout.WEST);
 		add(setupKeyValueList(), BorderLayout.CENTER);
+		this.remove(new JButton());
 	}
 
 	private void initialise_button_components(){
@@ -152,42 +155,35 @@ public class MainEditorClass extends JPanel {
 				ArrayList<String[]> table_contents = new ArrayList<String[]>();
 				Set<String> keys_visited = new HashSet<String>();
 				for (int row = 0; row < table_model.getRowCount(); row++){
-					
+
 					String current_key = table.getValueAt(row, 0).toString();
 					String current_value = table.getValueAt(row, 1).toString();
-					
-					System.out.println(current_key + current_value);
-						
+
 					if (keys_visited.contains(current_key)){
-						System.out.println("wowo");
 						publish("something");
-						System.out.println("wow");
 						return null;
 					} else if (!current_key.equals("")){
-						System.out.println("foos");
 						keys_visited.add(current_key);
 						table_contents.add(new String[]{ current_key, current_value });
 					}
 				}
-				
+
 				controller.flushall();
 				for (String[] entry : table_contents){
 					controller.add(entry[0], entry[1]);
 				}
-				System.out.println("did");
 				return null;
 			}
 
 			@Override
 			protected void done() {
-				System.out.println("done");
 			}
 
 			@Override
 			protected void process(List<String> chunks) {
 				DialogBoxes.displayErrorMessage("Duplicate key found");
 			}	
-			
+
 		}.execute();
 	}
 
