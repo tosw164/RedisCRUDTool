@@ -33,7 +33,6 @@ public class RedisController {
 			}
 			System.exit(1);
 		}
-//		System.out.println("Connection to " + connection_address + " successful");
 	}
 	
 	public ArrayList<String[]> getKeyValuePairData(){
@@ -42,7 +41,6 @@ public class RedisController {
 		
 		for(String key: list_of_keys){
 			array_to_return.add(new String[]{key, jedis_instance.get(key)});
-//			System.out.println(key + "\t" + jedis_instance.get(key));
 		}
 		return array_to_return;
 	}

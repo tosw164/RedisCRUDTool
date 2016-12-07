@@ -173,10 +173,6 @@ public class MainEditorClass extends JPanel {
 			}
 
 			@Override
-			protected void done() {
-			}
-
-			@Override
 			protected void process(List<String> chunks) {
 				DialogBoxes.displayErrorMessage("Duplicate key found");
 			}	
@@ -203,7 +199,6 @@ public class MainEditorClass extends JPanel {
 		System.exit(0);
 	}
 
-	//TODO multithread this
 	private void refreshTable(){
 		this.remove(scroll_pane);
 		
@@ -242,7 +237,7 @@ public class MainEditorClass extends JPanel {
 				TableRowSorter<TableModel> worker_sorter = new TableRowSorter<TableModel>(worker_model);
 				worker_table.setRowSorter(worker_sorter);
 				ArrayList<RowSorter.SortKey> key = new ArrayList<RowSorter.SortKey>();
-				key.add(new RowSorter.SortKey(0, SortOrder.DESCENDING));//default is ascending order of first column i.e. alphabetical order of words
+				key.add(new RowSorter.SortKey(0, SortOrder.DESCENDING));
 				worker_sorter.setSortKeys(key);
 				worker_sorter.sort();
 
