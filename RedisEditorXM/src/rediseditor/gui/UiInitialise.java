@@ -25,13 +25,6 @@ public class UiInitialise {
 		return save_button;
 	}
 
-	public static JButton createCancelButton(){
-		JButton cancel_button = new JButton("print contents");
-		cancel_button.setMaximumSize(new Dimension(300,30));
-		
-		return cancel_button;
-	}
-
 	public static JButton createAddRowButton(){
 		JButton add_button = new JButton("Add New Row");
 		add_button.setMaximumSize(new Dimension(300, 30));
@@ -45,14 +38,6 @@ public class UiInitialise {
 
 		return delete_button;
 	}
-
-	//TODO Make this button better (actually do something)
-
-	public static JButton createConnectButton(){
-		JButton connect_button = new JButton("Connect");
-		return connect_button;
-	}
-
 
 	public static JButton createCloseButton(){
 		JButton close_button = new JButton("close");

@@ -33,10 +33,8 @@ public class MainEditorClass extends JPanel {
 
 	private JButton refresh_button;
 	private JButton save_button;
-	private JButton cancel_button;
 	private JButton addrow_button;
 	private JButton deleterow_button;
-	private JButton connect_button;
 	private JButton close_button;
 
 	private JTable table;
@@ -82,8 +80,6 @@ public class MainEditorClass extends JPanel {
 
 		//Setup save and cancel buttons for when user is editing cell
 		left_button_cluster.add(save_button);
-		left_button_cluster.add(UiInitialise.createPadding(1, 10));
-		left_button_cluster.add(cancel_button);
 		left_button_cluster.add(UiInitialise.createPadding(1, 50));
 
 		left_button_cluster.add(addrow_button);
@@ -91,7 +87,6 @@ public class MainEditorClass extends JPanel {
 		left_button_cluster.add(deleterow_button);
 		left_button_cluster.add(UiInitialise.createPadding(1, 70));
 
-		left_button_cluster.add(connect_button);
 		left_button_cluster.add(close_button);
 
 
@@ -117,14 +112,6 @@ public class MainEditorClass extends JPanel {
 			}
 		});
 
-		cancel_button = UiInitialise.createCancelButton();
-		cancel_button.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				cancelButtonLogic();
-			}
-		});
-
 		addrow_button = UiInitialise.createAddRowButton();
 		addrow_button.addActionListener(new ActionListener() {
 			@Override
@@ -138,14 +125,6 @@ public class MainEditorClass extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				deleteRowButtonLogic();
-			}
-		});
-
-		connect_button = UiInitialise.createConnectButton();
-		connect_button.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				connectButtonLogic();
 			}
 		});
 
@@ -206,10 +185,6 @@ public class MainEditorClass extends JPanel {
 				refreshTable();
 			}
 		} 		
-	}
-
-	private void connectButtonLogic(){
-
 	}
 
 	private void closeButtonLogic(){
