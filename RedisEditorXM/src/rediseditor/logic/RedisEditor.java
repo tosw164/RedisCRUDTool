@@ -91,6 +91,8 @@ public class RedisEditor extends JPanel {
 		
 		Box left_button_cluster = Box.createVerticalBox();
 
+		left_button_cluster.add(UiInitialise.createPadding(1, 20));
+		left_button_cluster.add(new JLabel("Unsaved changes will be lost"));
 		left_button_cluster.add(refresh_button);
 		left_button_cluster.add(UiInitialise.createPadding(1, 50));
 
