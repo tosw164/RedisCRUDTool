@@ -8,28 +8,16 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 import rediseditor.gui.DialogBoxes;
 
 public class RedisController {
-	private static RedisController controller_instance;
 	private static Jedis jedis_instance;
 	
-	public static RedisController getInstance(String address){
-		if (address.equals("")){
-			controller_instance = new RedisController("localhost");
-		}
-		return controller_instance;
-	}
-	
-	private RedisController(String address){
-		newInstance(address);
-	}
-	
-	public static void newInstance(String connection_address){
+	public RedisController(String address){
 		try {
-			jedis_instance = new Jedis(connection_address);
+			jedis_instance = new Jedis(address);
 			jedis_instance.ping();
 		} catch (JedisConnectionException e){
-			if (e.getMessage().equals("java.net.UnknownHostException: " + connection_address)){
+			if (e.getMessage().equals("java.net.UnknownHostException: " + address)){
 				System.out.println("sadface");
-				DialogBoxes.displayErrorMessage("Could not connect to: " + connection_address);
+				DialogBoxes.displayErrorMessage("Could not connect to: " + address);
 			}
 			System.exit(1);
 		}

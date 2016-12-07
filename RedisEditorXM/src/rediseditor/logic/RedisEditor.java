@@ -60,7 +60,7 @@ public class RedisEditor extends JPanel {
 	}
 
 	public RedisEditor() {
-		controller = RedisController.getInstance(""); //TODO delete later don't always want localhost
+		controller = new RedisController("localhost"); //TODO delete later don't always want localhost
 
 		initialise_button_components();
 		scroll_pane = new JScrollPane(new JTable()); //Initialise scrollpane so remove doesn't throw NPE
