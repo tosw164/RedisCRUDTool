@@ -28,7 +28,7 @@ import rediseditor.gui.DialogBoxes;
 import rediseditor.gui.UiInitialise;
 import rediseditor.redis.RedisController;
 
-public class MainEditorClass extends JPanel {
+public class RedisEditor extends JPanel {
 
 	private static JFrame frame;
 	private static RedisController controller;
@@ -60,12 +60,12 @@ public class MainEditorClass extends JPanel {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
 		frame.setPreferredSize(new Dimension(1200, 500));
-		frame.add(new MainEditorClass());
+		frame.add(new RedisEditor());
 		frame.pack();
 		frame.setVisible(true);
 	}
 
-	public MainEditorClass() {
+	public RedisEditor() {
 		controller = RedisController.getInstance(""); //TODO delete later don't always want localhost
 
 		initialise_button_components();
