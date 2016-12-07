@@ -165,14 +165,6 @@ public class MainEditorClass extends JPanel {
 		System.out.println("save");
 	}
 
-	private void cancelButtonLogic(){
-		for(int row = 0; row < table_model.getRowCount(); row++){
-			if(!table.getValueAt(row, 0).equals("")){
-				System.out.println(table.getValueAt(row, 0) + "\t" + table.getValueAt(row, 1));
-			}
-		}
-	}
-
 	private void addRowButtonLogic(){
 		table_model.addRow(new Object[]{"", ""});
 	}
