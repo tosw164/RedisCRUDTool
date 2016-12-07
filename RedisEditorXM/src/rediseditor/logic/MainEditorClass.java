@@ -147,7 +147,9 @@ public class MainEditorClass extends JPanel {
 	}
 
 	private void saveButtonLogic(){
-		table.getCellEditor().stopCellEditing();
+		if (table.isEditing()){
+			table.getCellEditor().stopCellEditing();
+		}
 		new SwingWorker<Void, String>() {
 
 			@Override
