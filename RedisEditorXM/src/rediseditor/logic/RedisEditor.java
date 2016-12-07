@@ -12,17 +12,11 @@ import java.util.Set;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.RowSorter;
-import javax.swing.SortOrder;
 import javax.swing.SwingWorker;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
 
 import rediseditor.gui.DialogBoxes;
 import rediseditor.gui.UiInitialise;
@@ -30,8 +24,8 @@ import rediseditor.redis.RedisController;
 
 public class RedisEditor extends JPanel {
 
-	private static JFrame frame;
-	private static RedisController controller;
+	protected static JFrame frame;
+	static RedisController controller;
 
 	private JButton refresh_button;
 	private JButton save_button;
@@ -39,9 +33,9 @@ public class RedisEditor extends JPanel {
 	private JButton deleterow_button;
 	private JButton close_button;
 
-	private JTable table;
-	private DefaultTableModel table_model;
-	private JScrollPane scroll_pane;
+	protected JTable table;
+	protected DefaultTableModel table_model;
+	protected JScrollPane scroll_pane;
 
 	public static void main(String[] args) {		
 		EventQueue.invokeLater(new Runnable() {
@@ -55,7 +49,7 @@ public class RedisEditor extends JPanel {
 		});
 	}
 
-	public static void createGUI(){
+	private static void createGUI(){
 		frame = new JFrame("RedisEditor");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
@@ -201,73 +195,6 @@ public class RedisEditor extends JPanel {
 
 	private void refreshTable(){
 		this.remove(scroll_pane);
-		
-		new SwingWorker<Void, Object[]>(){
-
-			@Override
-			protected Void doInBackground() throws Exception {
-				String[] table_headings = {"Key", "Value"};
-				int row_count = 0;
-
-				TableModel worker_model = new DefaultTableModel(table_headings, row_count){
-					public boolean isCellEditable(int row, int column){
-						return true;
-					}
-
-					public Class getColumnClass(int column){
-						switch (column) {
-						default:
-							return String.class;
-						}
-					}
-				};
-
-				JTable worker_table = new JTable(worker_model);
-
-				for (String[] s: controller.getKeyValuePairData()){
-					((DefaultTableModel) worker_model).addRow(s);
-				}
-
-				worker_table.setModel(worker_model);
-				worker_table.getColumnModel().getColumn(0).setPreferredWidth(300);
-				worker_table.getColumnModel().getColumn(1).setPreferredWidth(900);
-
-
-				//For ordering
-				TableRowSorter<TableModel> worker_sorter = new TableRowSorter<TableModel>(worker_model);
-				worker_table.setRowSorter(worker_sorter);
-				ArrayList<RowSorter.SortKey> key = new ArrayList<RowSorter.SortKey>();
-				key.add(new RowSorter.SortKey(0, SortOrder.DESCENDING));
-				worker_sorter.setSortKeys(key);
-				worker_sorter.sort();
-
-				worker_table.getTableHeader().setReorderingAllowed(false);
-
-				//Alignment for the cells http://stackoverflow.com/a/7433758
-				DefaultTableCellRenderer alignment_renderer = new DefaultTableCellRenderer();
-				alignment_renderer.setHorizontalAlignment(JLabel.CENTER);
-				worker_table.setDefaultRenderer(String.class, alignment_renderer);
-				worker_table.setDefaultRenderer(Integer.class, alignment_renderer);
-
-				//adds scroll pane to table to panel
-				JScrollPane worker_scrollpane = new JScrollPane(worker_table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-				worker_table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-				worker_scrollpane.setVisible(true);
-				worker_scrollpane.setMinimumSize(new Dimension(550, 400));
-				
-				Object[] component_package = new Object[]{worker_table, worker_model, worker_scrollpane};
-				publish(component_package);
-				return null;
-			}
-
-			@Override
-			protected void process(List<Object[]> chunks) {
-				table = (JTable) chunks.get(chunks.size() -1)[0];
-				table_model = (DefaultTableModel) chunks.get(chunks.size() - 1)[1];
-				scroll_pane = (JScrollPane) chunks.get(chunks.size() - 1)[2];
-				add(scroll_pane, BorderLayout.CENTER);
-				frame.pack();
-			}
-		}.execute();
+		new RedisFetcherWorker(this).execute();
 	}
 }
