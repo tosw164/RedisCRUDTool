@@ -96,7 +96,7 @@ public class MainEditorClass extends JPanel {
 	}
 
 	private void initialise_button_components(){
-		refresh_button = UiInitialise.createRefreshButton();
+		refresh_button = UiInitialise.createButton("Refresh");
 		refresh_button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -104,7 +104,7 @@ public class MainEditorClass extends JPanel {
 			}
 		});
 
-		save_button = UiInitialise.createSaveButton();
+		save_button = UiInitialise.createButton("Save All");
 		save_button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -112,7 +112,7 @@ public class MainEditorClass extends JPanel {
 			}
 		});
 
-		addrow_button = UiInitialise.createAddRowButton();
+		addrow_button = UiInitialise.createButton("Add New Row");
 		addrow_button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -120,7 +120,7 @@ public class MainEditorClass extends JPanel {
 			}
 		});
 
-		deleterow_button = UiInitialise.createDeleteRowButton();
+		deleterow_button = UiInitialise.createButton("Delete Selected");
 		deleterow_button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -128,7 +128,7 @@ public class MainEditorClass extends JPanel {
 			}
 		});
 
-		close_button = UiInitialise.createCloseButton();
+		close_button = UiInitialise.createButton("close");
 		close_button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
