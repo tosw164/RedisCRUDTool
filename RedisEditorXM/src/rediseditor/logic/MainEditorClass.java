@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.Box;
@@ -17,6 +18,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
+import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -142,28 +144,53 @@ public class MainEditorClass extends JPanel {
 	}
 
 	private void saveButtonLogic(){
-		ArrayList<String[]> table_contents = new ArrayList<String[]>();
-		Set<String> keys_visited = new HashSet<String>();
-		for (int row = 0; row < table_model.getRowCount(); row++){
-			
-			String current_key = table.getValueAt(row, 0).toString();
-			String current_value = table.getValueAt(row, 1).toString();
-			
-			if (keys_visited.contains(current_key)){
-				DialogBoxes.displayErrorMessage("Duplicate key found");
-				return;
-			} else if (!current_key.equals("")){
-				keys_visited.add(current_key);
-				table_contents.add(new String[]{ current_key, current_value });
+		table.getCellEditor().stopCellEditing();
+		new SwingWorker<Void, String>() {
+
+			@Override
+			protected Void doInBackground() throws Exception {
+				ArrayList<String[]> table_contents = new ArrayList<String[]>();
+				Set<String> keys_visited = new HashSet<String>();
+				for (int row = 0; row < table_model.getRowCount(); row++){
+					
+					String current_key = table.getValueAt(row, 0).toString();
+					String current_value = table.getValueAt(row, 1).toString();
+					
+					System.out.println(current_key + current_value);
+						
+					if (keys_visited.contains(current_key)){
+						System.out.println("wowo");
+						publish("something");
+						System.out.println("wow");
+						return null;
+					} else if (!current_key.equals("")){
+						System.out.println("foos");
+						keys_visited.add(current_key);
+						table_contents.add(new String[]{ current_key, current_value });
+					}
+				}
+				
+				controller.flushall();
+				for (String[] entry : table_contents){
+					controller.add(entry[0], entry[1]);
+				}
+				System.out.println("did");
+				return null;
 			}
-		}
-		
-		controller.flushall();
-		for (String[] entry : table_contents){
-			controller.add(entry[0], entry[1]);
-		}
-		System.out.println("save");
+
+			@Override
+			protected void done() {
+				System.out.println("done");
+			}
+
+			@Override
+			protected void process(List<String> chunks) {
+				DialogBoxes.displayErrorMessage("Duplicate key found");
+			}	
+			
+		}.execute();
 	}
+
 
 	private void addRowButtonLogic(){
 		table_model.addRow(new Object[]{"", ""});
