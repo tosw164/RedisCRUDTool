@@ -3,9 +3,6 @@ package rediseditor.redis;
 import java.util.ArrayList;
 import java.util.Set;
 
-import javax.print.attribute.standard.DialogTypeSelection;
-import javax.swing.JOptionPane;
-
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 import rediseditor.gui.DialogBoxes;
