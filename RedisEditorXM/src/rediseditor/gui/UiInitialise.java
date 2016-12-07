@@ -19,14 +19,14 @@ public class UiInitialise {
 	}
 
 	public static JButton createSaveButton(){
-		JButton save_button = new JButton("save");
+		JButton save_button = new JButton("save all");
 		save_button.setMaximumSize(new Dimension(300,30));
 
 		return save_button;
 	}
 
 	public static JButton createCancelButton(){
-		JButton cancel_button = new JButton("cancel");
+		JButton cancel_button = new JButton("print contents");
 		cancel_button.setMaximumSize(new Dimension(300,30));
 		
 		return cancel_button;
@@ -60,4 +60,5 @@ public class UiInitialise {
 
 		return close_button;
 	}
+	
 }

@@ -67,4 +67,7 @@ public class RedisController {
 		jedis_instance.set(key.toString(), value.toString());
 	}
 	
+	public void flushall(){
+		jedis_instance.flushAll();
+	}
 }
