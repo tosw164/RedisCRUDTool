@@ -223,7 +223,9 @@ public class RedisEditor extends JPanel {
 	 * Quits program
 	 */
 	private void closeButtonLogic(){
-		System.exit(0);
+		if (DialogBoxes.displayWarningPrompt("Are you sure? Unsaved changes will be lost")){
+			System.exit(0);
+		}
 	}
 
 	/**
