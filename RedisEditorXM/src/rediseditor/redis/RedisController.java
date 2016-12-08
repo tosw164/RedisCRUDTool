@@ -72,20 +72,20 @@ public class RedisController {
 		return jedis_instance.keys("*");
 	}
 	
-	/**
-	 * Method that accepts a key and deletes its key-pair from Redis after user
-	 * approves the deletion
-	 * 
-	 * @param key to delete
-	 * @return	boolean depending if delete was done or not
-	 */
-	public boolean deletePrompt(Object key){
-		if (DialogBoxes.displayWarningPrompt("Are you sure you want to delete ["+key.toString()+"] ?")){
-			delete(key);
-			return true;
-		}
-		return false;
-	}
+//	/**
+//	 * Method that accepts a key and deletes its key-pair from Redis after user
+//	 * approves the deletion
+//	 * 
+//	 * @param key to delete
+//	 * @return	boolean depending if delete was done or not
+//	 */
+//	public boolean deletePrompt(Object key){
+//		if (DialogBoxes.displayWarningPrompt("Are you sure you want to delete ["+key.toString()+"] ?")){
+//			delete(key);
+//			return true;
+//		}
+//		return false;
+//	}
 	
 	/**
 	 * Method that deletes a key-value pair without prompt from Redis

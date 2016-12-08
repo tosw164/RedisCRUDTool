@@ -12,8 +12,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
 
+import rediseditor.gui.DialogBoxes;
 import rediseditor.gui.UiInitialise;
 import rediseditor.redis.RedisController;
 
@@ -92,7 +94,8 @@ public class RedisEditor extends JPanel {
 		Box left_button_cluster = Box.createVerticalBox();
 
 		left_button_cluster.add(UiInitialise.createPadding(1, 20));
-		left_button_cluster.add(new JLabel("Unsaved changes will be lost"));
+		left_button_cluster.add(new JLabel("Unsaved changes"));
+		left_button_cluster.add(new JLabel("will be lost"));
 		left_button_cluster.add(refresh_button);
 		left_button_cluster.add(UiInitialise.createPadding(1, 50));
 
@@ -102,6 +105,8 @@ public class RedisEditor extends JPanel {
 		left_button_cluster.add(addrow_button);
 		left_button_cluster.add(UiInitialise.createPadding(1, 10));
 		left_button_cluster.add(deleterow_button);
+		left_button_cluster.add(new JLabel("Unsaved changes will"));
+		left_button_cluster.add(new JLabel("not be deleted"));
 		left_button_cluster.add(UiInitialise.createPadding(1, 70));
 
 		left_button_cluster.add(close_button);
@@ -197,8 +202,17 @@ public class RedisEditor extends JPanel {
 		int index_selected = table.getSelectedRow();
 		if (index_selected != -1){
 			String key_to_remove = (String) table.getValueAt(table.getSelectedRow(), 0);
-			//TODO swingworker
-			if ( controller.deletePrompt(key_to_remove) ){
+			
+			//If user confirms, then the key-value pair will be deleted from Redis
+			//on another thread to prevent slowing down of GUI
+			if ( DialogBoxes.displayWarningPrompt("Are you sure you want to delete ["+key_to_remove+"] ?")){
+				new SwingWorker<Void, Void>() {
+					@Override
+					protected Void doInBackground() throws Exception {
+						controller.delete(key_to_remove);
+						return null;
+					}
+				}.execute();
 				refreshTable();
 			}
 		} 		
