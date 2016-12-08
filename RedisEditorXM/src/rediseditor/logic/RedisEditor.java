@@ -197,6 +197,7 @@ public class RedisEditor extends JPanel {
 		int index_selected = table.getSelectedRow();
 		if (index_selected != -1){
 			String key_to_remove = (String) table.getValueAt(table.getSelectedRow(), 0);
+			//TODO swingworker
 			if ( controller.deletePrompt(key_to_remove) ){
 				refreshTable();
 			}

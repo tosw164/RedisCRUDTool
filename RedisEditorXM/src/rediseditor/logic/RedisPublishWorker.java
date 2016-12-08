@@ -21,6 +21,7 @@ import rediseditor.gui.DialogBoxes;
  * @author theooswanditosw164
  */
 final class RedisPublishWorker extends SwingWorker<Void, String> {
+	
 	private final RedisEditor redisEditor; //Instance of the parent so that it can access various fields
 
 	/**
